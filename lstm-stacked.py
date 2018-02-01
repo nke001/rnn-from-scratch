@@ -48,7 +48,7 @@ class LSTM_rnn():
             # step - LSTM
             def step(prev, x):
                 # gather previous internal state and output state
-                st_1, ct_1 = tf.unpack(prev)
+                st_1, ct_1 = tf.unstack(prev)
 
                 # iterate through layers
                 st, ct = [], []
@@ -73,7 +73,7 @@ class LSTM_rnn():
                     inp = st_i
                     st.append(st_i)
                     ct.append(ct_i)
-                return tf.pack([st, ct])
+                return tf.stack([st, ct])
             ###
             # here comes the scan operation; wake up!
             #   tf.scan(fn, elems, initializer)
@@ -101,9 +101,9 @@ class LSTM_rnn():
             logits = tf.matmul(states_reshaped, V) + bo
             # predictions
             predictions = tf.nn.softmax(logits) 
-            #
+            
             # optimization
-            losses = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, ys_)
+            losses = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=ys_)
             loss = tf.reduce_mean(losses)
             train_op = tf.train.AdagradOptimizer(learning_rate=0.05).minimize(loss)
             #
